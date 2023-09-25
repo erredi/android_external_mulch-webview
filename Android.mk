@@ -1,4 +1,4 @@
-#
+k#
 # Copyright (C) 2014 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,31 +14,30 @@
 # limitations under the License.
 #
 
-# Install the prebuilt 'Bromite' webview apk.
-#   see https://www.bromite.org/
+# Install the prebuilt webview apk.
 
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_OVERRIDES_PACKAGES := webview
 
-LOCAL_MODULE := mulch-webview
+LOCAL_MODULE := webview
 LOCAL_MODULE_CLASS := APPS
-LOCAL_MULTILIB := both
-LOCAL_CERTIFICATE := PRESIGNED
-
-# Only move to /product, if Android 11 or above)
-ifeq ( ,$(filter 24 25 26 27 28 29, $(PLATFORM_SDK_VERSION)))
 LOCAL_PRODUCT_MODULE := true
-endif
-
+LOCAL_MULTILIB := both
 LOCAL_REQUIRED_MODULES := \
         libwebviewchromium_loader \
         libwebviewchromium_plat_support
 
 LOCAL_MODULE_TARGET_ARCH := arm arm64 x86 x86_64
 my_src_arch := $(call get-prebuilt-src-arch,$(LOCAL_MODULE_TARGET_ARCH))
-LOCAL_SRC_FILES := prebuilt/$(my_src_arch)/MulchSystemWebView.apk
+LOCAL_SRC_FILES := prebuilt/$(my_src_arch)/webview.apk
+
+# Don't sign our arm* builds for out-of-band distribution
+ifneq ( ,$(filter $(my_src_arch), arm arm64))
+LOCAL_CERTIFICATE := PRESIGNED
+else
+LOCAL_CERTIFICATE := $(DEFAULT_SYSTEM_DEV_CERTIFICATE)
+endif
 
 LOCAL_PREBUILT_JNI_LIBS_arm := @lib/armeabi-v7a/libwebviewchromium.so
 LOCAL_PREBUILT_JNI_LIBS_arm64 := @lib/arm64-v8a/libwebviewchromium.so
@@ -46,3 +45,5 @@ LOCAL_PREBUILT_JNI_LIBS_x86 := @lib/x86/libwebviewchromium.so
 LOCAL_PREBUILT_JNI_LIBS_x86_64 := @lib/x86_64/libwebviewchromium.so
 
 include $(BUILD_PREBUILT)
+
+
